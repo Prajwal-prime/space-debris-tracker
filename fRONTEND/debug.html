@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cesium Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+            color: #333;
+        }
+        #consoleOutput {
+            background: #000;
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .error { color: #ff6b6b; }
+        .warning { color: #feca57; }
+        .info { color: #54a0ff; }
+        h1 { margin-top: 0; }
+        button {
+            padding: 10px 15px;
+            background: #54a0ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #2e86de;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cesium Debug Console</h1>
+    <div id="consoleOutput"></div>
+    
+    <button id="testCesium">Test Cesium Connection</button>
+    <button id="testEarth">Test Earth Loading</button>
+    <button id="clearConsole">Clear Console</button>
+    
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.93/Build/Cesium/Cesium.js"></script>
+    <script>
+        // Override console methods
+        const consoleOutput = document.getElementById('consoleOutput');
+        
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalInfo = console.info;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            appendToConsole('log', args);
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            appendToConsole('error', args);
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            appendToConsole('warning', args);
+        };
+        
+        console.info = function(...args) {
+            originalInfo.apply(console, args);
+            appendToConsole('info', args);
+        };
+        
+        function appendToConsole(type, args) {
+            const div = document.createElement('div');
+            div.className = type;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            let content = `[${timestamp}] [${type.toUpperCase()}]: `;
+            
+            args.forEach(arg => {
+                if (typeof arg === 'object') {
+                    try {
+                        content += JSON.stringify(arg) + ' ';
+                    } catch (e) {
+                        content += arg + ' ';
+                    }
+                } else {
+                    content += arg + ' ';
+                }
+            });
+            
+            div.textContent = content;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        // Test buttons
+        document.getElementById('testCesium').addEventListener('click', () => {
+            console.log('Testing Cesium connection...');
+            try {
+                if (typeof Cesium !== 'undefined') {
+                    console.log('Cesium is loaded. Version:', Cesium.VERSION);
+                } else {
+                    console.error('Cesium is not defined!');
+                }
+            } catch (e) {
+                console.error('Error testing Cesium:', e.message);
+            }
+        });
+        
+        document.getElementById('testEarth').addEventListener('click', () => {
+            console.log('Testing Earth rendering...');
+            try {
+                // Create a temporary viewer to test Earth rendering
+                const container = document.createElement('div');
+                container.style.width = '1px';
+                container.style.height = '1px';
+                container.style.position = 'absolute';
+                container.style.visibility = 'hidden';
+                document.body.appendChild(container);
+                
+                // Set token
+                Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiNGFhNjQyZS01NGM1LTQ2YzItOTY2Mi1lZWRlZDA0OTBjNjQiLCJpZCI6MjgwNTEzLCJpYXQiOjE3NDA5ODEwMjh9.TqWAvnUF6yHfLOo3MYz5Ji32SzqCCgOJ9h_EXKXr1o0';
+                
+                // Create viewer with minimal settings
+                const viewer = new Cesium.Viewer(container, {
+                    terrain: Cesium.createWorldTerrain(),
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    navigationHelpButton: false,
+                    sceneModePicker: false,
+                    animation: false,
+                    timeline: false
+                });
+                
+                console.log('Globe is created:', Boolean(viewer.scene.globe));
+                console.log('Globe is rendering:', !viewer.scene.globe.isDestroyed());
+                
+                // Check for imagery
+                const imageryLayers = viewer.imageryLayers;
+                console.log('Imagery layers count:', imageryLayers.length);
+                
+                // Cleanup
+                setTimeout(() => {
+                    viewer.destroy();
+                    document.body.removeChild(container);
+                    console.log('Test viewer destroyed');
+                }, 2000);
+                
+            } catch (e) {
+                console.error('Error testing Earth:', e.message);
+            }
+        });
+        
+        document.getElementById('clearConsole').addEventListener('click', () => {
+            consoleOutput.innerHTML = '';
+        });
+        
+        // Initial log
+        console.log('Debug console initialized');
+    </script>
+</body>
+</html> 

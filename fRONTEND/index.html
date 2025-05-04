@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Space Debris Collision Predictor</title>
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Cesium CSS -->
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.93/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <nav>
+      <div class="logo"><i class="fas fa-satellite"></i> Space Debris Tracker</div>
+      <ul class="nav-links">
+        <li><a href="#" class="active"><i class="fas fa-globe"></i> Dashboard</a></li>
+        <li><a href="http://localhost:8502" target="_blank"><i class="fas fa-chart-line"></i> Advanced Analytics</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Sidebar Toggle Buttons -->
+    <button id="toggle-left" class="toggle-btn arrow-btn arrow-left"></button>
+
+    <!-- Left Sidebar: Control Panel -->
+    <div id="control-panel" class="sidebar">
+      <h2><i class="fas fa-sliders-h"></i> Control Panel</h2>
+      <!-- Satellite Selector -->
+      <label for="satellite-select">Select Satellite:</label>
+      <select id="satellite-select">
+        <option value="all">All Satellites</option>
+        <option value="ISS">ISS</option>
+        <option value="NOAA20">NOAA-20</option>
+        <option value="OSTM">OSTM</option>
+      </select>
+      <!-- Time Slider (initially disabled) -->
+      <div class="control-group">
+        <label for="time-slider">Time:</label>
+        <input type="range" id="time-slider" min="0" max="5400" value="0" disabled />
+        <span id="time-display">00:00:00</span>
+      </div>
+    </div>
+
+    <!-- Visualization Container (Cesium Viewer) -->
+    <div id="visualization-container">
+      <div id="visualization"></div>
+      <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Processing data...</p>
+      </div>
+      
+      <!-- Satellite Info Panel (Hidden by default) -->
+      <div id="satellite-info-panel" class="satellite-info hidden">
+        <div class="close-btn"><i class="fas fa-times"></i></div>
+        <div class="satellite-header">
+          <h3><i class="fas fa-satellite"></i> <span id="satellite-name">Satellite Name</span></h3>
+        </div>
+        <div class="satellite-details">
+          <div class="detail-item">
+            <span class="label"><i class="fas fa-calendar-alt"></i> Launched:</span>
+            <span id="satellite-launch" class="value">Unknown</span>
+          </div>
+          <div class="detail-item">
+            <span class="label"><i class="fas fa-building"></i> Operator:</span>
+            <span id="satellite-operator" class="value">Unknown</span>
+          </div>
+          <div class="detail-item">
+            <span class="label"><i class="fas fa-ruler-vertical"></i> Altitude:</span>
+            <span id="satellite-altitude" class="value">Unknown</span>
+          </div>
+          <div class="detail-item">
+            <span class="label"><i class="fas fa-angle-double-up"></i> Inclination:</span>
+            <span id="satellite-inclination" class="value">Unknown</span>
+          </div>
+          <div class="detail-item">
+            <span class="label"><i class="fas fa-info-circle"></i> Purpose:</span>
+            <span id="satellite-purpose" class="value">Unknown</span>
+          </div>
+          <div class="detail-item">
+            <span class="label"><i class="fas fa-tachometer-alt"></i> Status:</span>
+            <span id="satellite-status" class="value active">Active</span>
+          </div>
+        </div>
+        <div class="action-buttons">
+          <button id="follow-satellite" class="action-btn follow-btn">
+            <i class="fas fa-eye"></i> Follow
+          </button>
+          <button id="jump-to-analytics" class="action-btn analytics-btn">
+            <i class="fas fa-chart-line"></i> Analytics
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p><i class="fas fa-copyright"></i> 2025 Space Debris Collision Predictor | Data provided by NASA &amp; Space-Track</p>
+  </footer>
+
+  <!-- Scripts -->
+  <!-- Satellite.js for TLE propagation (must be loaded first) -->
+  <script src="https://unpkg.com/satellite.js/dist/satellite.min.js"></script>
+  <!-- Cesium JS -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.93/Build/Cesium/Cesium.js"></script>
+  <!-- Main application JavaScript -->
+  <script src="main.js"></script>
+</body>
+</html>
